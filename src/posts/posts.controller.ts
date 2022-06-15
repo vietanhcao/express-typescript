@@ -1,6 +1,9 @@
 import * as express from "express";
 import Post from "./posts.interface";
 import postModel from "./posts.model";
+import PostNotFoundException from "../exceptions/PostNotFoundException";
+import validationMiddleware from "../middleware/validation.middleware";
+import CreatePostDto from "./posts.dto";
 
 class PostsController {
   public path = "/posts";
@@ -20,23 +23,23 @@ class PostsController {
 
   public intializeRoutes() {
     this.router.get(this.path, this.getAllPosts);
-    this.router.post(this.path, this.createAPost);
+    this.router.post(this.path, validationMiddleware(CreatePostDto), this.createAPost);
     this.router.get(`${this.path}/:id`, this.getPostById);
-    this.router.patch(`${this.path}/:id`, this.modifyPost);
+    this.router.patch(`${this.path}/:id`, validationMiddleware(CreatePostDto, true), this.modifyPost);
     this.router.delete(`${this.path}/:id`, this.deletePost);
   }
-  deletePost = (request: express.Request, response: express.Response) => {
+  deletePost = (request: express.Request, response: express.Response, next: express.NextFunction) => {
     const id = request.params.id;
     postModel.findByIdAndDelete(id).then((successResponse) => {
       if (successResponse) {
         response.sendStatus(200);
       } else {
-        response.sendStatus(404);
+        next(new PostNotFoundException(id));
       }
     });
   };
 
-  modifyPost = (request: express.Request, response: express.Response) => {
+  modifyPost = (request: express.Request, response: express.Response, next: express.NextFunction) => {
     const id = request.params.id;
     const postData: Post = request.body;
     postModel
@@ -44,14 +47,22 @@ class PostsController {
         new: true,
       })
       .then((post) => {
-        response.send(post);
+        if (post) {
+          response.send(post);
+        } else {
+          next(new PostNotFoundException(id));
+        }
       });
   };
 
-  getPostById = async (request: express.Request, response: express.Response) => {
+  getPostById = async (request: express.Request, response: express.Response, next: express.NextFunction) => {
     const id = request.params.id;
     postModel.findById(id).then((post) => {
-      response.send(post);
+      if (post) {
+        response.send(post);
+      } else {
+        next(new PostNotFoundException(id));
+      }
     });
   };
 

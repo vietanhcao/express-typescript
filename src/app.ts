@@ -2,6 +2,7 @@ import * as express from "express";
 import * as bodyParser from "body-parser";
 import * as mongoose from "mongoose";
 import { Controller } from "./utils/base-type";
+import errorMiddleware from "./middleware/error.middleware";
 
 class App {
   public app: express.Application;
@@ -14,21 +15,25 @@ class App {
     this.connectToTheDataBase();
     this.initializeMiddlewares();
     this.initializeControllers(controllers);
+    this.initializeErrorHanding();
+  }
+  public listen() {
+    this.app.listen(this.port, () => {
+      console.log(`App listening on the port ${this.port}`);
+    });
   }
 
   private initializeMiddlewares() {
     this.app.use(bodyParser.json());
   }
 
+  private initializeErrorHanding() {
+    this.app.use(errorMiddleware);
+  }
+
   private initializeControllers(controllers: Array<Controller>) {
     controllers.forEach((controller) => {
       this.app.use("/", controller.router);
-    });
-  }
-
-  public listen() {
-    this.app.listen(this.port, () => {
-      console.log(`App listening on the port ${this.port}`);
     });
   }
 
