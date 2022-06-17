@@ -26,6 +26,7 @@ class AuthenticationController implements Controller {
   public intializeRoutes() {
     this.router.post(`${this.path}/register`, validationMiddleware(CreateUserDto), this.registration);
     this.router.post(`${this.path}/loign`, validationMiddleware(LoginDto), this.loggingIn);
+    this.router.post(`${this.path}/logout`, this.loggingOut);
   }
 
   private registration = async (request: Request, response: Response, next: NextFunction) => {
@@ -34,7 +35,7 @@ class AuthenticationController implements Controller {
       next(new UserWithThatEmailAlreadyExistsException(userData.email));
     } else {
       const hashedPassword = await bcrypt.hash(userData.password, 10);
-      const user = new this.user({ ...userData, password: hashedPassword });
+      const user = await this.user.create({ ...userData, password: hashedPassword });
       user.password = undefined;
       const tokenData = this.createToken(user);
       response.setHeader("Set-Cookie", [this.createCookie(tokenData)]);
@@ -66,9 +67,15 @@ class AuthenticationController implements Controller {
     const dataStoredInToken: DataStoredInToken = { _id: user._id };
     return { expiresIn, token: jwt.sign(dataStoredInToken, secret, { expiresIn }) };
   }
+
   private createCookie(tokenData: TokenData) {
     return `Authorization=${tokenData.token}; HttpOnly; Max-Age=${tokenData.expiresIn}`;
   }
+
+  private loggingOut = (request: Request, response: Response) => {
+    response.setHeader("Set-Cookie", ["Authorization=;Max-age=0"]);
+    response.sendStatus(200);
+  };
 }
 
 export default AuthenticationController;

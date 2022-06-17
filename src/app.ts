@@ -3,6 +3,7 @@ import * as bodyParser from "body-parser";
 import * as mongoose from "mongoose";
 import { Controller } from "./utils/base-type";
 import errorMiddleware from "./middleware/error.middleware";
+import * as cookieParser from "cookie-parser";
 
 class App {
   public app: express.Application;
@@ -25,6 +26,7 @@ class App {
 
   private initializeMiddlewares() {
     this.app.use(bodyParser.json());
+    this.app.use(cookieParser());
   }
 
   private initializeErrorHanding() {

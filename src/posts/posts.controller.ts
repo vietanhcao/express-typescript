@@ -4,6 +4,8 @@ import postModel from "./posts.model";
 import PostNotFoundException from "../exceptions/PostNotFoundException";
 import validationMiddleware from "../middleware/validation.middleware";
 import CreatePostDto from "./posts.dto";
+import authMiddleware from "../middleware/auth.middleware";
+import RequestWithUser from "../interface/requestWithUser.interface";
 
 class PostsController {
   public path = "/posts";
@@ -23,10 +25,13 @@ class PostsController {
 
   public intializeRoutes() {
     this.router.get(this.path, this.getAllPosts);
-    this.router.post(this.path, validationMiddleware(CreatePostDto), this.createAPost);
     this.router.get(`${this.path}/:id`, this.getPostById);
-    this.router.patch(`${this.path}/:id`, validationMiddleware(CreatePostDto, true), this.modifyPost);
-    this.router.delete(`${this.path}/:id`, this.deletePost);
+
+    this.router
+      .all(`${this.path}/*`, authMiddleware)
+      .post(this.path, authMiddleware, validationMiddleware(CreatePostDto), this.createAPost)
+      .patch(`${this.path}/:id`, validationMiddleware(CreatePostDto, true), this.modifyPost)
+      .delete(`${this.path}/:id`, this.deletePost);
   }
   deletePost = (request: express.Request, response: express.Response, next: express.NextFunction) => {
     const id = request.params.id;
@@ -67,15 +72,14 @@ class PostsController {
   };
 
   getAllPosts = async (request: express.Request, response: express.Response) => {
-    // postModel.find().exec();	  it will be return a promise
     postModel.find().then((posts) => {
       response.send(posts);
     });
   };
 
-  createAPost = (request: express.Request, response: express.Response) => {
+  createAPost = (request: RequestWithUser, response: express.Response) => {
     const postData: Post = request.body;
-    const createdPost = new postModel(postData);
+    const createdPost = new postModel({ ...postData, authorId: request.user._id });
     createdPost.save().then((savedPost) => {
       response.send(savedPost);
     });
