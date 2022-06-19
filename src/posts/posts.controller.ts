@@ -6,21 +6,18 @@ import validationMiddleware from "../middleware/validation.middleware";
 import CreatePostDto from "./posts.dto";
 import authMiddleware from "../middleware/auth.middleware";
 import RequestWithUser from "../interface/requestWithUser.interface";
+import userModel from "../users/user.model";
+import { Model } from "mongoose";
+import User from "../users/user.interface";
 
 class PostsController {
   public path = "/posts";
   public router = express.Router();
-
-  private posts: Post[] = [
-    {
-      author: "Marcin",
-      content: "Dolor sit amet",
-      title: "Lorem Ipsum",
-    },
-  ];
+  private user: Model<User>;
 
   constructor() {
     this.intializeRoutes();
+    this.user = userModel;
   }
 
   public intializeRoutes() {
@@ -72,17 +69,26 @@ class PostsController {
   };
 
   getAllPosts = async (request: express.Request, response: express.Response) => {
-    postModel.find().then((posts) => {
-      response.send(posts);
-    });
+    postModel
+      .find()
+      .populate("author", "-password")
+      .then((posts) => {
+        response.send(posts);
+      });
   };
 
-  createAPost = (request: RequestWithUser, response: express.Response) => {
+  createAPost = async (request: RequestWithUser, response: express.Response) => {
     const postData: Post = request.body;
-    const createdPost = new postModel({ ...postData, authorId: request.user._id });
-    createdPost.save().then((savedPost) => {
-      response.send(savedPost);
-    });
+    const createdPost = new postModel({ ...postData, author: request.user._id });
+
+    // manny to manny  to take care of the consistency of the data
+    const user = await this.user.findById(request.user._id);
+    user.posts = [...user.posts, createdPost._id];
+    await user.save();
+
+    const savedPost = await createdPost.save();
+    await savedPost.populate("author", "-password -__v");
+    response.send(savedPost);
   };
 }
 

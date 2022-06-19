@@ -1,3 +1,4 @@
+import Post from "../posts/posts.interface";
 interface User {
   _id: string;
   firstName: string;
@@ -9,6 +10,7 @@ interface User {
     street: string;
     city: string;
   };
+  posts?: Post[];
 }
 
 export default User;
