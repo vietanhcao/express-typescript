@@ -23,6 +23,9 @@ class App {
       console.log(`App listening on the port ${this.port}`);
     });
   }
+  public getServer() {
+    return this.app;
+  }
 
   private initializeMiddlewares() {
     this.app.use(bodyParser.json());

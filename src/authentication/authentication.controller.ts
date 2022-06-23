@@ -1,25 +1,16 @@
-import * as bcrypt from "bcrypt";
-import { Request, Response, NextFunction, Router } from "express";
+import { NextFunction, Request, Response, Router } from "express";
 import { Controller } from "../utils/base-type";
-// import UserWithThatEmailAlreadyExistsException from '../exceptions/UserWithThatEmailAlreadyExistsException';
-// import WrongCredentialsException from '../exceptions/WrongCredentialsException';
 import validationMiddleware from "../middleware/validation.middleware";
 import CreateUserDto from "../users/user.dto";
 import userModel from "./../users/user.model";
-// import LogInDto from "./logIn.dto";
-import LoginDto from "./login.dto";
-import * as jwt from "jsonwebtoken";
-import User from "../users/user.interface";
-import { DataStoredInToken, TokenData } from "./token.types";
-import WrongCredentialsException from "../exceptions/WrongCredentialsException";
-import UserWithThatEmailAlreadyExistsException from "../exceptions/UserWithThatEmailAlreadyExistsException";
 import AuthenticationService from "./authentication.service";
+import LoginDto from "./login.dto";
 
 class AuthenticationController implements Controller {
   public path = "/auth";
   public router = Router();
   private user = userModel;
-  private authenticationService = new AuthenticationService();
+  public authenticationService = new AuthenticationService();
 
   constructor() {
     this.intializeRoutes();
