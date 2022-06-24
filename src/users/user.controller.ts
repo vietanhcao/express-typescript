@@ -18,13 +18,13 @@ class UserController implements Controller {
     this.router.get(`${this.path}/:id/posts`, authMiddleware(), this.getAllPostsOfUser);
   }
 
-  private getAllPostsOfUser = async (request: RequestWithUser, response: Response, next: NextFunction) => {
+  private async getAllPostsOfUser(request: RequestWithUser, response: Response, next: NextFunction) {
     const userId = request.params.id;
     if (userId === request.user._id.toString()) {
       const posts = await this.post.find({ author: userId });
       response.send(posts);
     }
     next(new NotAuthorizedException());
-  };
+  }
 }
 export default UserController;

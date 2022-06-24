@@ -39,7 +39,7 @@ class AuthenticationController implements Controller {
     );
   }
 
-  private secondFactorAuthentication = async (request: RequestWithUser, response: Response, next: NextFunction) => {
+  private secondFactorAuthentication(request: RequestWithUser, response: Response, next: NextFunction) {
     const { twoFactorAuthenticationCode } = request.body;
     const user = request.user;
     const isCodeValid = this.authenticationService.verifyTwoFactorAuthenticationCode(twoFactorAuthenticationCode, user);
@@ -50,9 +50,9 @@ class AuthenticationController implements Controller {
     } else {
       next(new WrongAuthenticationTokenException());
     }
-  };
+  }
 
-  private generateTwoFatorAuthenticationCode = async (request: RequestWithUser, response: Response, next: NextFunction) => {
+  private async generateTwoFatorAuthenticationCode(request: RequestWithUser, response: Response, next: NextFunction) {
     const user = request.user;
     const { otpauthUrl, base32 } = this.authenticationService.getTwoFactorAuthenticationCode(user.email);
     await this.user.findByIdAndUpdate(
@@ -63,9 +63,9 @@ class AuthenticationController implements Controller {
       },
     );
     this.authenticationService.respondWithQRCode(otpauthUrl, response);
-  };
+  }
 
-  private turnOnTwoFactorAuthentication = async (request: RequestWithUser, response: Response, next: NextFunction) => {
+  private async turnOnTwoFactorAuthentication(request: RequestWithUser, response: Response, next: NextFunction) {
     const { twoFactorAuthenticationCode } = request.body;
     const isCodeValid = this.authenticationService.verifyTwoFactorAuthenticationCode(twoFactorAuthenticationCode, request.user);
     if (isCodeValid) {
@@ -80,9 +80,9 @@ class AuthenticationController implements Controller {
     } else {
       next(new WrongAuthenticationTokenException());
     }
-  };
+  }
 
-  private registration = async (request: Request, response: Response, next: NextFunction) => {
+  private async registration(request: Request, response: Response, next: NextFunction) {
     const userData: CreateUserDto = request.body;
     try {
       const { user, cookie } = await this.authenticationService.registration(userData);
@@ -91,9 +91,9 @@ class AuthenticationController implements Controller {
     } catch (error) {
       next(error);
     }
-  };
+  }
 
-  private loggingIn = async (request: Request, response: Response, next: NextFunction) => {
+  private async loggingIn(request: Request, response: Response, next: NextFunction) {
     const userData: LoginDto = request.body;
 
     try {
@@ -107,12 +107,12 @@ class AuthenticationController implements Controller {
     } catch (error) {
       next(error);
     }
-  };
+  }
 
-  private loggingOut = (request: Request, response: Response) => {
+  private loggingOut(request: Request, response: Response) {
     response.setHeader("Set-Cookie", ["Authorization=;Max-age=0"]);
     response.sendStatus(200);
-  };
+  }
 }
 
 export default AuthenticationController;

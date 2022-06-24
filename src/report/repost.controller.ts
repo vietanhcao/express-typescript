@@ -15,7 +15,7 @@ class ReportController implements Controller {
     this.router.get(this.path, this.generateReport);
     this.router.get(`${this.path}/count`, this.getNumberOfUser);
   }
-  private getNumberOfUser = async (request: Request, response: Response, next: NextFunction) => {
+  private async getNumberOfUser(request: Request, response: Response, next: NextFunction) {
     const numberOfUsersWithAddress = await this.user.countDocuments({
       address: {
         $exists: true,
@@ -28,9 +28,9 @@ class ReportController implements Controller {
     });
 
     response.send({ numberOfUsersWithAddress, countries });
-  };
+  }
 
-  private generateReport = async (request: Request, response: Response, next: NextFunction) => {
+  private async generateReport(request: Request, response: Response, next: NextFunction) {
     const usersByCountry = await this.user.aggregate([
       {
         $match: {
@@ -70,7 +70,7 @@ class ReportController implements Controller {
       },
     ]);
     response.send({ usersByCountry });
-  };
+  }
 }
 
 export default ReportController;

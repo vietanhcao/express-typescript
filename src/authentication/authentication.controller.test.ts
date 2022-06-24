@@ -21,6 +21,7 @@ describe("The AuthenticationController", () => {
           ...userData,
           _id: 0,
         });
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (mongoose as any).connect = jest.fn();
         const app = new App([authenticationController], 5000);
         return request(app.getServer())

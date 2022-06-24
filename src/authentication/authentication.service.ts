@@ -37,13 +37,11 @@ class AuthenticationService {
         const tokenData = this.createToken(user);
         const cookie = this.createCookie(tokenData);
         if (user.isTwoFactorAuthenticationEnabled) {
-          return { isTwoFactorAuthenticationEnabled: true, cookie, tokenData };
-        } else {
-          return { user, cookie, tokenData };
+          return { cookie, tokenData, isTwoFactorAuthenticationEnabled: true };
         }
-      } else {
-        throw new WrongCredentialsException();
+        return { user, cookie, tokenData };
       }
+      throw new WrongCredentialsException();
     } else {
       throw new WrongCredentialsException();
     }
@@ -52,7 +50,7 @@ class AuthenticationService {
   public createToken(user: User, isSecondFactorAuthenticated = false): TokenData {
     const expiresIn = 60 * 60; // an hour
     const secret = process.env.JWT_SECRET;
-    const dataStoredInToken: DataStoredInToken = { _id: user._id, isSecondFactorAuthenticated };
+    const dataStoredInToken: DataStoredInToken = { isSecondFactorAuthenticated, _id: user._id };
     return { expiresIn, token: jwt.sign(dataStoredInToken, secret, { expiresIn }) };
   }
 

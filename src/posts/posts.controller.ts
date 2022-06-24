@@ -30,7 +30,7 @@ class PostsController {
       .patch(`${this.path}/:id`, validationMiddleware(CreatePostDto, true), this.modifyPost)
       .delete(`${this.path}/:id`, this.deletePost);
   }
-  deletePost = (request: express.Request, response: express.Response, next: express.NextFunction) => {
+  deletePost(request: express.Request, response: express.Response, next: express.NextFunction) {
     const id = request.params.id;
     postModel.findByIdAndDelete(id).then((successResponse) => {
       if (successResponse) {
@@ -39,9 +39,9 @@ class PostsController {
         next(new PostNotFoundException(id));
       }
     });
-  };
+  }
 
-  modifyPost = (request: express.Request, response: express.Response, next: express.NextFunction) => {
+  modifyPost(request: express.Request, response: express.Response, next: express.NextFunction) {
     const id = request.params.id;
     const postData: Post = request.body;
     postModel
@@ -55,9 +55,9 @@ class PostsController {
           next(new PostNotFoundException(id));
         }
       });
-  };
+  }
 
-  getPostById = async (request: express.Request, response: express.Response, next: express.NextFunction) => {
+  async getPostById(request: express.Request, response: express.Response, next: express.NextFunction) {
     const id = request.params.id;
     postModel.findById(id).then((post) => {
       if (post) {
@@ -66,18 +66,18 @@ class PostsController {
         next(new PostNotFoundException(id));
       }
     });
-  };
+  }
 
-  getAllPosts = async (request: express.Request, response: express.Response) => {
+  async getAllPosts(request: express.Request, response: express.Response) {
     postModel
       .find()
       .populate("author", "-password")
       .then((posts) => {
         response.send(posts);
       });
-  };
+  }
 
-  createAPost = async (request: RequestWithUser, response: express.Response) => {
+  async createAPost(request: RequestWithUser, response: express.Response) {
     const postData: Post = request.body;
     const createdPost = new postModel({ ...postData, author: request.user._id });
 
@@ -89,7 +89,7 @@ class PostsController {
     const savedPost = await createdPost.save();
     await savedPost.populate("author", "-password -__v");
     response.send(savedPost);
-  };
+  }
 }
 
 export default PostsController;
