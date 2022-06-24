@@ -18,6 +18,8 @@ const userSchema = new mongoose.Schema({
       type: mongoose.Schema.Types.ObjectId,
     },
   ],
+  twoFactorAuthenticationCode: String,
+  isTwoFactorAuthenticationEnabled: Boolean,
 });
 
 const userModel = mongoose.model<User & mongoose.Document>("User", userSchema);

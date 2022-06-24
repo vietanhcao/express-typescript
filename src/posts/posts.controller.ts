@@ -25,8 +25,8 @@ class PostsController {
     this.router.get(`${this.path}/:id`, this.getPostById);
 
     this.router
-      .all(`${this.path}/*`, authMiddleware)
-      .post(this.path, authMiddleware, validationMiddleware(CreatePostDto), this.createAPost)
+      .all(`${this.path}/*`, authMiddleware())
+      .post(this.path, authMiddleware(), validationMiddleware(CreatePostDto), this.createAPost)
       .patch(`${this.path}/:id`, validationMiddleware(CreatePostDto, true), this.modifyPost)
       .delete(`${this.path}/:id`, this.deletePost);
   }

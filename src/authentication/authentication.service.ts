@@ -1,12 +1,15 @@
-import userModel from "../users/user.model";
 import * as bcrypt from "bcrypt";
 import * as jwt from "jsonwebtoken";
+import * as speakeasy from "speakeasy";
+import * as QRCode from "qrcode";
+import userModel from "../users/user.model";
 import CreateUserDto from "../users/user.dto";
 import UserWithThatEmailAlreadyExistsException from "../exceptions/UserWithThatEmailAlreadyExistsException";
 import { DataStoredInToken, TokenData } from "./token.types";
 import User from "../users/user.interface";
 import LoginDto from "./login.dto";
 import WrongCredentialsException from "../exceptions/WrongCredentialsException";
+import { Response } from "express";
 
 class AuthenticationService {
   public user = userModel;
@@ -33,7 +36,11 @@ class AuthenticationService {
         user.password = undefined;
         const tokenData = this.createToken(user);
         const cookie = this.createCookie(tokenData);
-        return { user, cookie, tokenData };
+        if (user.isTwoFactorAuthenticationEnabled) {
+          return { isTwoFactorAuthenticationEnabled: true, cookie, tokenData };
+        } else {
+          return { user, cookie, tokenData };
+        }
       } else {
         throw new WrongCredentialsException();
       }
@@ -42,15 +49,37 @@ class AuthenticationService {
     }
   }
 
-  public createToken(user: User): TokenData {
+  public createToken(user: User, isSecondFactorAuthenticated = false): TokenData {
     const expiresIn = 60 * 60; // an hour
     const secret = process.env.JWT_SECRET;
-    const dataStoredInToken: DataStoredInToken = { _id: user._id };
+    const dataStoredInToken: DataStoredInToken = { _id: user._id, isSecondFactorAuthenticated };
     return { expiresIn, token: jwt.sign(dataStoredInToken, secret, { expiresIn }) };
   }
 
   public createCookie(tokenData: TokenData) {
     return `Authorization=${tokenData.token}; HttpOnly; Max-Age=${tokenData.expiresIn}`;
+  }
+
+  public getTwoFactorAuthenticationCode(email: string) {
+    const secretCode = speakeasy.generateSecret({
+      name: `${process.env.TWO_FACTOR_AUTHENTICATION_APP_NAME} ${email}`,
+    });
+    return {
+      otpauthUrl: secretCode.otpauth_url,
+      base32: secretCode.base32,
+    };
+  }
+
+  public respondWithQRCode(data: string, response: Response) {
+    QRCode.toFileStream(response, data);
+  }
+
+  public verifyTwoFactorAuthenticationCode(twoFactorAuthenticationCode: string, user: User) {
+    return speakeasy.totp.verify({
+      secret: user.twoFactorAuthenticationCode,
+      encoding: "base32",
+      token: twoFactorAuthenticationCode,
+    });
   }
 }
 
