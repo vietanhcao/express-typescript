@@ -1,14 +1,13 @@
 language: node_js
 node_js:
-  - lts/*
+- lts/*
 script:
-  - "npm run lint"
-  - "npm run eslint:fix"
-# safelist
-branches:
-  only:
-    - master
-# # blocklist
+- npm run lint
+- npm run eslint:fix
 branches:
   except:
   - legacy
+deploy:
+  provider: heroku
+  api_key:
+    secure: ncJkJULGtrPjvzgGPSsYb82pevuG9WQYhty8ecwEct8Esn6zH/vDK83C6YoaHMwzh2Qcfv6FFWBBFd4XG1VW3HN8qUPzVeHGFun7Fw/WgSA/8xLvLzIkCDAAO2EmZxUTyAF1jlo2nso/2W/pD15JujCc2PXZGUUmcms8/UROjY8yW6rUmZ+h2YlNpIhCpe0B9UxH0GHWIPDiD0QW88+H/1hSK1wnpwj3YisiIxpexAaDha39jjTRyjmHOrYZHj5Bhi0avz84BCtvBlanf02JVdJO5aElFGhXsVMgilIVndtsZObDvfh0s5FTEigt+4yNCSGHqrRZ35OVMda79gv3I6EvY+whkGRaOxWPFTULiHrI5YeAC63BTOygG6LC6y1Dj/XKblnNgBkTiugfZcEtNFPjs+XWnr2T84t198Y/iao4DHtI4rxpCr45KsAGfF30q/8+lAw97cfwNIcW+Cyz5pZdtIvtppOWMoo+pdNlXEeiJcN4dAK4vHson/iY7fuE+ZHoccRfxTE+piBJGqA2l9Buuqv8zFvwQYDk+OZ8brt/iqnc+D21NXz1Ft++9H7b9nzS2MDCGTubpV7xFArbtI7DxnnnXtLiTYKuAn+7yll2c2HeP9hE0441ZLG3+SFd2z1+9MNokLl0agaTcwe4GwOcd2a6KBh6LEGZYhfUSs4=
