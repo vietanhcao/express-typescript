@@ -1,9 +1,9 @@
-import HttpException from "./HttpException";
+import HttpException from "./HttpException"
 
 class NotAuthorizedException extends HttpException {
   constructor() {
-    super(403, "You're not authorized");
+    super(403, "You're not authorized")
   }
 }
 
-export default NotAuthorizedException;
+export default NotAuthorizedException

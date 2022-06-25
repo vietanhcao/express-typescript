@@ -1,33 +1,33 @@
-import { NextFunction, Response, Router, Request } from "express";
-import userModel from "../users/user.model";
-import { Controller } from "../utils/base-type";
+import { NextFunction, Response, Router, Request } from "express"
+import userModel from "../users/user.model"
+import { Controller } from "../utils/base-type"
 
 class ReportController implements Controller {
-  public path = "/report";
-  public router = Router();
-  private user = userModel;
+  public path = "/report"
+  public router = Router()
+  private user = userModel
 
   constructor() {
-    this.initializeRoutes();
+    this.initializeRoutes()
   }
 
   public initializeRoutes() {
-    this.router.get(this.path, this.generateReport);
-    this.router.get(`${this.path}/count`, this.getNumberOfUser);
+    this.router.get(this.path, this.generateReport)
+    this.router.get(`${this.path}/count`, this.getNumberOfUser)
   }
   private async getNumberOfUser(request: Request, response: Response, next: NextFunction) {
     const numberOfUsersWithAddress = await this.user.countDocuments({
       address: {
         $exists: true,
       },
-    });
+    })
     const countries = await this.user.distinct("address.country", {
       email: {
         $regex: /@gmail.com$/,
       },
-    });
+    })
 
-    response.send({ numberOfUsersWithAddress, countries });
+    response.send({ numberOfUsersWithAddress, countries })
   }
 
   private async generateReport(request: Request, response: Response, next: NextFunction) {
@@ -68,9 +68,9 @@ class ReportController implements Controller {
       {
         $sort: { amountOfArticles: 1 },
       },
-    ]);
-    response.send({ usersByCountry });
+    ])
+    response.send({ usersByCountry })
   }
 }
 
-export default ReportController;
+export default ReportController

@@ -1,5 +1,5 @@
-import * as mongoose from "mongoose";
-import Post from "./posts.interface";
+import * as mongoose from "mongoose"
+import Post from "./posts.interface"
 
 const postSchema = new mongoose.Schema(
   {
@@ -11,8 +11,8 @@ const postSchema = new mongoose.Schema(
     title: String,
   },
   { timestamps: true, toJSON: { virtuals: true } },
-);
+)
 
-const postModel = mongoose.model<Post & mongoose.Document>("Post", postSchema);
+const postModel = mongoose.model<Post & mongoose.Document>("Post", postSchema)
 
-export default postModel;
+export default postModel

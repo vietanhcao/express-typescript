@@ -1,11 +1,11 @@
-import * as mongoose from "mongoose";
-import User from "./user.interface";
+import * as mongoose from "mongoose"
+import User from "./user.interface"
 
 const addressSchema = new mongoose.Schema({
   city: String,
   street: String,
   country: String,
-});
+})
 
 const userSchema = new mongoose.Schema({
   address: addressSchema,
@@ -20,8 +20,8 @@ const userSchema = new mongoose.Schema({
   ],
   twoFactorAuthenticationCode: String,
   isTwoFactorAuthenticationEnabled: Boolean,
-});
+})
 
-const userModel = mongoose.model<User & mongoose.Document>("User", userSchema);
+const userModel = mongoose.model<User & mongoose.Document>("User", userSchema)
 
-export default userModel;
+export default userModel

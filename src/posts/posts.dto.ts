@@ -1,11 +1,11 @@
-import { IsString } from "class-validator";
+import { IsString } from "class-validator"
 
 class CreatePostDto {
   @IsString()
-  public content: string;
+  public content: string
 
   @IsString()
-  public title: string;
+  public title: string
 }
 
-export default CreatePostDto;
+export default CreatePostDto

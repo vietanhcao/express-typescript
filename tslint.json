@@ -10,17 +10,26 @@
   "rules": {
     "max-line-length": [
       true,
-      150
+      180
     ],
     "quotemark": [
       true,
       "double"
     ],
-
+    "semicolon": [false, "never"],
     "prefer-template": false,
     "interface-name": [true, "never-prefix"],
     "import-name": false,
     "no-console": false,
+    "trailing-comma": [false, {
+      "singleline": "never",
+      "multiline": {
+        "objects": "always",     // <==================
+        "arrays": "always",
+        "functions": "never",
+        "typeLiterals": "ignore"
+      }
+    }],
     "object-literal-sort-keys": false
   },
   "rulesDirectory": []

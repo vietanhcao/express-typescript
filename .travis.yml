@@ -9,6 +9,6 @@ branches:
   only:
     - master
 # # blocklist
-# branches:
-#   except:
-#   - legacy
+branches:
+  except:
+  - legacy
