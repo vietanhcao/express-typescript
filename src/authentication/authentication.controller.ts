@@ -40,7 +40,7 @@ class AuthenticationController implements Controller {
   }
 
   private secondFactorAuthentication = (request: RequestWithUser, response: Response, next: NextFunction) => {
-    const { twoFactorAuthenticationCode } = request.body
+    const { twoFactorAuthenticationCode } = request?.body
     const user = request.user
     const isCodeValid = this.authenticationService.verifyTwoFactorAuthenticationCode(twoFactorAuthenticationCode, user)
     if (isCodeValid) {
