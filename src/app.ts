@@ -44,10 +44,10 @@ class App {
 
   private connectToTheDataBase() {
     const { MONGO_USERNAME, MONGO_PASSWORD, MONGO_DATABASE, MONGO_HOST } = process.env
-    // mongoose.connect(`mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@${MONGO_HOST}`, {
-    //   dbName: MONGO_DATABASE,
-    // })
-    mongoose.connect(`mongodb+srv://${MONGO_USERNAME}:${MONGO_PASSWORD}@cluster0.btc8asi.mongodb.net/${MONGO_DATABASE}?retryWrites=true&w=majority`)
+    mongoose.connect(`mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@${MONGO_HOST}`, {
+      dbName: MONGO_DATABASE,
+    })
+    // mongoose.connect(`mongodb+srv://${MONGO_USERNAME}:${MONGO_PASSWORD}@cluster0.btc8asi.mongodb.net/${MONGO_DATABASE}?retryWrites=true&w=majority`)
   }
 }
 

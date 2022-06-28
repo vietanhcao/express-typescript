@@ -4,11 +4,14 @@ import postModel from "../posts/posts.model"
 import authMiddleware from "../middleware/auth.middleware"
 import RequestWithUser from "../interface/requestWithUser.interface"
 import NotAuthorizedException from "../exceptions/NotAuthorizedException"
+import userModel from "./user.model"
+import UserNotFoundException from "../exceptions/UserNotFoundException"
 
 class UserController implements Controller {
   public path = "/users"
   public router = Router()
   private post = postModel
+  private user = userModel
 
   constructor() {
     this.initializeRoutes()
@@ -16,6 +19,7 @@ class UserController implements Controller {
 
   private initializeRoutes() {
     this.router.get(`${this.path}/:id/posts`, authMiddleware(), this.getAllPostsOfUser)
+    this.router.get(`${this.path}/:id`, authMiddleware(), this.getUserById)
   }
 
   private getAllPostsOfUser = async (request: RequestWithUser, response: Response, next: NextFunction) => {
@@ -25,6 +29,19 @@ class UserController implements Controller {
       response.send(posts)
     }
     next(new NotAuthorizedException())
+  }
+  private getUserById = async (request: RequestWithUser, response: Response, next: NextFunction) => {
+    const id = request.params.id
+    const userQuery = this.user.findById(id)
+    if (request.query.withPosts === "true") {
+      userQuery.populate("posts").exec()
+    }
+    const user = await userQuery
+    if (user) {
+      response.send(user)
+    } else {
+      next(new UserNotFoundException(id))
+    }
   }
 }
 export default UserController

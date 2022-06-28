@@ -31,7 +31,8 @@ class AuthenticationService {
   public loggingIn = async (userData: LoginDto) => {
     const user = await this.user.findOne({ email: userData.email })
     if (user) {
-      const isPasswordValid = await bcrypt.compare(userData.password, user.password)
+      // const isPasswordValid = await bcrypt.compare(userData.password, user.password)
+      const isPasswordValid = await bcrypt.compare(userData.password, user.get("password", null, { getters: false }))
       if (isPasswordValid) {
         user.password = undefined
         const tokenData = this.createToken(user)

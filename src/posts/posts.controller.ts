@@ -71,7 +71,8 @@ class PostsController {
   async getAllPosts(request: express.Request, response: express.Response) {
     postModel
       .find()
-      .populate("author", "-password")
+      // .populate("author", "-password")
+      .populate("author")
       .then((posts) => {
         response.send(posts)
       })

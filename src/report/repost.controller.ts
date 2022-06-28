@@ -30,7 +30,7 @@ class ReportController implements Controller {
     response.send({ numberOfUsersWithAddress, countries })
   }
 
-  private async generateReport(request: Request, response: Response, next: NextFunction) {
+  private generateReport = async (request: Request, response: Response, next: NextFunction) => {
     const usersByCountry = await this.user.aggregate([
       {
         $match: {
