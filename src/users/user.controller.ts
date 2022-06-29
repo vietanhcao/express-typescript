@@ -26,19 +26,19 @@ class UserController implements Controller {
     const userId = request.params.id
     if (userId === request.user._id.toString()) {
       const posts = await this.post.find({ author: userId })
-      response.send(posts)
+      response.json(posts)
     }
     next(new NotAuthorizedException())
   }
   private getUserById = async (request: RequestWithUser, response: Response, next: NextFunction) => {
     const id = request.params.id
-    const userQuery = this.user.findById(id)
+    const userQuery = this.user.findById(id).lean() // don’t perform the hydration,
     if (request.query.withPosts === "true") {
-      userQuery.populate("posts").exec()
+      userQuery.populate("posts")
     }
     const user = await userQuery
     if (user) {
-      response.send(user)
+      response.json(user)
     } else {
       next(new UserNotFoundException(id))
     }

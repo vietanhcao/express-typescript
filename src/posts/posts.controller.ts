@@ -27,7 +27,8 @@ class PostsController {
     this.router
       .all(`${this.path}/*`, authMiddleware())
       .post(this.path, authMiddleware(), validationMiddleware(CreatePostDto), this.createAPost)
-      .patch(`${this.path}/:id`, validationMiddleware(CreatePostDto, true), this.modifyPost)
+      .put(`${this.path}/:id`, validationMiddleware(CreatePostDto, true), this.modifyPostWithPut)
+      .patch(`${this.path}/:id`, validationMiddleware(CreatePostDto, true), this.modifyPostWithPatch)
       .delete(`${this.path}/:id`, this.deletePost)
   }
   deletePost(request: express.Request, response: express.Response, next: express.NextFunction) {
@@ -41,9 +42,25 @@ class PostsController {
     })
   }
 
-  modifyPost(request: express.Request, response: express.Response, next: express.NextFunction) {
+  async modifyPostWithPut(request: express.Request, response: express.Response, next: express.NextFunction) {
     const id = request.params.id
     const postData: Post = request.body
+    postModel
+      .replaceOne({ _id: id }, postData)
+      .setOptions({ new: true, overwrite: true })
+      .then((post) => {
+        if (post) {
+          response.send(post)
+        } else {
+          next(new PostNotFoundException(id))
+        }
+      })
+  }
+
+  async modifyPostWithPatch(request: express.Request, response: express.Response, next: express.NextFunction) {
+    const id = request.params.id
+    const postData: Post = request.body
+
     postModel
       .findByIdAndUpdate(id, postData, {
         new: true,
